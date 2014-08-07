@@ -22,7 +22,6 @@
  * */
 
 define('PDGA_SERVER', "https://api.pdga.com");
-global $settings;
 
 
 /*
@@ -40,6 +39,7 @@ function pdga_getSession()
        return $session;
     }
 
+    global $settings;
     $request_url = PDGA_SERVER . '/services/json/user/login';
     $user_data = array(
         'username' => $settings['PDGA_USERNAME'],
@@ -88,8 +88,8 @@ function pdga_getPlayer($pdga_number = 0)
         return null;
     }
 
-    if (isset($cache{"$pdga_number"})) {
-        return $cache{"$pdga_number"};
+    if (isset($cache["$pdga_number"])) {
+        return $cache["$pdga_number"];
     }
 
     if (!($session = pdga_getSession()))
@@ -102,17 +102,19 @@ function pdga_getPlayer($pdga_number = 0)
     curl_setopt($curl, CURLOPT_URL, $request_url);
     curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
     $response = curl_exec($curl);
+    $http_code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
     if ($http_code == 200) {
         $decoded = json_decode($response, true);
         if (!$decoded || isset($decoded{"status"})) {
             error_log("Getting data for PDGA#$pdga_number failed, status " . $decoded{"status"});
             return null;
-        } else
-            $cache{"$pdga_number"} = $decoded;
+        } else {
+            $cache["$pdga_number"] = $decoded;
+        }
     } else {
         $error = curl_error($curl);
-        error_log("Getting player data failed: ". $error);
+        error_log("Getting player data failed: code $http_code, ". $error);
         return null;
     }
 

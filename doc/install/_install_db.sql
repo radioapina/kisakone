@@ -116,8 +116,11 @@ CREATE TABLE :Event
   ContactInfo VARCHAR(250) NOT NULL,
   FeesRequired TINYINT NOT NULL,
   AdBanner INT NULL,
-  -- added 2014.02.15
-  PlayerLimit INT NOT NULL DEFAULT 0,
+  -- added 2014.10.03
+  PoolCount INT NOT NULL DEFAULT 1,
+  -- by tumi
+  -- added 2014.02.15, then removed 2014.10.03, moved to Pool
+  -- PlayerLimit INT NOT NULL DEFAULT 0,
   -- by Tumi
   PRIMARY KEY(id),
   FOREIGN KEY(Venue) REFERENCES :Venue(id),
@@ -191,6 +194,9 @@ CREATE TABLE `:Round`
 (
   id INT NOT NULL AUTO_INCREMENT,
   Event INT NOT NULL,
+  -- added 2014.10.03
+  Pool INT NOT NULL DEFAULT 1,
+  -- by tumi
   Course INT NULL,
   StartType VARCHAR(12) NOT NULL,
   StartTime DATETIME NOT NULL,
@@ -345,6 +351,9 @@ CREATE TABLE :ClassInEvent
   id INT NOT NULL AUTO_INCREMENT,
   Classification INT NOT NULL,
   Event INT NOT NULL,
+  -- added 2014.10.03
+  Pool INT NOT NULL DEFAULT 1,
+  -- by Tumi
   -- added 2014.02.15
   MinQuota INT NOT NULL DEFAULT 0,
   MaxQuota INT NOT NULL DEFAULT 999,
@@ -395,3 +404,18 @@ CREATE TABLE :EventQueue (
 SHOW WARNINGS;
 -- end 2012.02.15 migration
 
+
+-- added 2014.10.03
+-- you need to run upgrade-20141003 to have this
+CREATE TABLE :Pool (
+  id INT NOT NULL AUTO_INCREMENT,
+  PoolNumber INT NOT NULL DEFAULT 1,
+  PoolText VARCHAR(20) DEFAULT NULL,
+  Event INT NOT NULL,
+  PlayerLimit INT NOT NULL DEFAULT 999,
+  PRIMARY KEY(id),
+  FOREIGN KEY (Event) REFERENCES :Event(id),
+  INDEX(PoolNumber)
+) ENGINE=InnoDB;
+SHOW WARNINGS;
+-- end 2014.10.03 migration

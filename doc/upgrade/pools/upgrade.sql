@@ -2,10 +2,6 @@
 -- SQL migration from versions 2014.10.03 and earlier
 -- Use the upgrade script upgrade_20141003.php!
 
--- change the incorrect term PoolNumber to GroupNumber as we'll introduce real pools
-ALTER TABLE :StartingOrder CHANGE COLUMN PoolNumber GroupNumber SMALLINT NOT NULL;
-SHOW WARNINGS;
-
 -- introduce the Pool
 CREATE TABLE :Pool (
   id INT NOT NULL AUTO_INCREMENT,

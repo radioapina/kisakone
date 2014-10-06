@@ -1,10 +1,11 @@
-Upgrading to version 2014.10.03:
+Upgrading to version "pools":
 ================================
 
-We need to alter one table.
+We need to alter few tables and add a completely new, "Pool" table.
 Upgrade script will read your database settings from `config.php`, no changes required.
 
-1. Check `upgrade.sql` for intended SQL changes.
-2. While in this upgrade directory, run `php upgrade.php`
+1. Check `upgrade.sql` and `upgrade2.sql` for intended SQL changes.
+2. Check `upgrade.php` for migration steps that will be run.
+3. While in this upgrade directory, run `php -f upgrade.php`
 
 It should print no output on success.

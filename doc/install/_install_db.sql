@@ -395,3 +395,14 @@ CREATE TABLE :EventQueue (
 SHOW WARNINGS;
 -- end 2012.02.15 migration
 
+
+-- added 2015.01.xx
+-- if using previous version, add this to your database!
+CREATE TABLE :Config (
+  id INT NOT NULL AUTO_INCREMENT,
+  key VARCHAR(128) NOT NULL,
+  val VARCHAR(4096) NOT NULL,
+  INDEX(id)
+) ENGINE=InnoDB;
+SHOW WARNINGS;
+-- end 2015.01.xx migration

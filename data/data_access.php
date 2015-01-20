@@ -440,7 +440,7 @@ function GetEventDetails($eventid)
 
       $query = format_query("SELECT DISTINCT :Event.id, :Venue.Name AS Venue, :Venue.id AS VenueID, Tournament, AdBanner, :Event.Name, ContactInfo,
                                       UNIX_TIMESTAMP(Date) Date, Duration, PlayerLimit, UNIX_TIMESTAMP(ActivationDate) ActivationDate, UNIX_TIMESTAMP(SignupStart) SignupStart,
-                                      UNIX_TIMESTAMP(SignupEnd) SignupEnd, ResultsLocked,
+                                      UNIX_TIMESTAMP(SignupEnd) SignupEnd, ResultsLocked, PdgaEventId,
                                       :EventManagement.Role AS Management, :Participation.Approved, :Participation.EventFeePaid, :Participation.Standing, :Level.id LevelId,
                                       :Level.Name Level, :Tournament.id TournamentId, :Tournament.Name Tournament, :Participation.SignupTimestamp
                                       FROM :Event
@@ -453,7 +453,7 @@ function GetEventDetails($eventid)
    }
    else {
       $query = format_query("SELECT DISTINCT :Event.id id, :Venue.Name AS Venue, Tournament, AdBanner, :Event.Name, UNIX_TIMESTAMP(Date) Date, Duration, PlayerLimit, UNIX_TIMESTAMP(ActivationDate) ActivationDate, ContactInfo,
-                            UNIX_TIMESTAMP(SignupStart) SignupStart, UNIX_TIMESTAMP(SignupEnd) SignupEnd, ResultsLocked, :Level.id LevelId, :Level.Name Level,
+                            UNIX_TIMESTAMP(SignupStart) SignupStart, UNIX_TIMESTAMP(SignupEnd) SignupEnd, ResultsLocked, PdgaEventId, :Level.id LevelId, :Level.Name Level,
                             :Tournament.id TournamentId, :Tournament.Name Tournament
                                       FROM :Event
                                       LEFT JOIN :Level ON :Level.id = :Event.Level
@@ -646,16 +646,16 @@ function GetSectionDetails($sectionId)
  * an Error in case there was an error in creating a new event.
  */
 function CreateEvent($name, $venue, $duration, $playerlimit, $contact, $tournament, $level, $start,
-                      $signup_start, $signup_end, $classes, $td, $officials, $requireFees)
+                      $signup_start, $signup_end, $classes, $td, $officials, $requireFees, $pdgaId)
 {
     $retValue = null;
 
-    $query = format_query( "INSERT INTO :Event (Venue, Tournament, Level, Name, Date, Duration, PlayerLimit, SignupStart, SignupEnd, ContactInfo, FeesRequired) VALUES
+    $query = format_query( "INSERT INTO :Event (Venue, Tournament, Level, Name, Date, Duration, PlayerLimit, SignupStart, SignupEnd, ContactInfo, FeesRequired, PdgaEventId) VALUES
                      (%d, %d, %d, '%s', FROM_UNIXTIME(%d), %d, %d, FROM_UNIXTIME(%s), FROM_UNIXTIME(%s), '%s', %d)",
                       esc_or_null($venue, 'int'), esc_or_null($tournament, 'int'), esc_or_null($level, 'int'), mysql_real_escape_string($name),
                       (int) $start, (int) $duration, (int) $playerlimit,
                       esc_or_null($signup_start, 'int'), esc_or_null($signup_end,'int'), mysql_escape_string($contact),
-                      $requireFees );
+                      $requireFees, $pdgaId);
     $result = execute_query($query);
 
     if ($result) {
@@ -920,7 +920,7 @@ function GetEventOfficials($event)
 
 
 // Edit event information
-function EditEvent($eventid, $name, $venuename, $duration, $playerlimit, $contact, $tournament, $level, $start, $signup_start, $signup_end, $state, $requireFees)
+function EditEvent($eventid, $name, $venuename, $duration, $playerlimit, $contact, $tournament, $level, $start, $signup_start, $signup_end, $state, $requireFees, $pdgaId)
  {
    $venueid = GetVenueId($venuename);
 
@@ -928,20 +928,18 @@ function EditEvent($eventid, $name, $venuename, $duration, $playerlimit, $contac
    $locking = ($state =='done') ? time() : 'NULL';
    $query = format_query("UPDATE `:Event` SET `Venue` = %d, `Tournament` = %s, Level = %d, `Name` = '%s', `Date` = FROM_UNIXTIME(%d),
                     `Duration` = %d, `PlayerLimit` = %d, `SignupStart` = FROM_UNIXTIME(%s), `SignupEnd` = FROM_UNIXTIME(%s),
-                    ActivationDate = FROM_UNIXTIME( %s), ResultsLocked = FROM_UNIXTIME(%s), ContactInfo = '%s', FeesRequired = %d
+                    ActivationDate = FROM_UNIXTIME( %s), ResultsLocked = FROM_UNIXTIME(%s), ContactInfo = '%s', FeesRequired = %d, PdgaEventId = %d
                     WHERE id = %d",
                             $venueid,
                             esc_or_null($tournament, 'int'), $level, mysql_real_escape_string($name), (int) $start,
                             (int) $duration, (int) $playerlimit,
                             esc_or_null($signup_start,'int'), esc_or_null($signup_end,'int'), $activation,
                             $locking,
-                            mysql_real_escape_string($contact),  $requireFees , (int) $eventid);
+                            mysql_real_escape_string($contact), $requireFees, $pdgaId, (int) $eventid);
    $result = execute_query($query);
 
    if (!$result)
       return Error::Query($query);
-
-   mysql_free_result($result);
 }
 
 
@@ -1019,7 +1017,7 @@ function SetClasses($eventid, $classes)
    if (isset($eventid)) {
       $quotas = GetEventQuotas($eventid);
       $query = format_query("DELETE FROM :ClassInEvent WHERE Event = $eventid");
-      $result = execute_query($query);
+      execute_query($query);
 
       foreach ($classes as $class) {
          $query = format_query("INSERT INTO :ClassInEvent (Classification, Event) VALUES (%d, %d);",
@@ -1045,7 +1043,6 @@ function SetClasses($eventid, $classes)
    else
       return Error::internalError("Event id argument is not set.");
 
-   mysql_free_result($result);
    return $retValue;
 }
 
@@ -1063,7 +1060,7 @@ function SetRounds( $eventid, $rounds, $deleteRounds = array())
    foreach ($deleteRounds as $toDelete) {
       $toDelete = (int) $toDelete;
       $query = format_query("DELETE FROM :Round WHERE Event = $eventid AND id = $toDelete");
-      $result = execute_query($query);
+      execute_query($query);
    }
 
    foreach ($rounds as $round) {
@@ -1084,13 +1081,12 @@ function SetRounds( $eventid, $rounds, $deleteRounds = array())
                            $r_event, esc_or_null($r_course, 'int'), $r_starttype, $r_starttime, $r_interval, $r_validresults);
          $result = execute_query($query);
 
-         if ($result)
-            $roundid = mysql_insert_id();
-         else
+         if (!$result)
             return Error::Query($query);
+
+         $roundid = mysql_insert_id();
       }
    }
-   mysql_free_result($result);
 
    return $retValue;
 }

@@ -62,7 +62,7 @@ license_ok_b           B-lisenssi OK.
 license_ok_foreign     Ulkomaalaisen pelaajan PDGA-jäsenyys on kunnossa.
 licenses_fail          Lisenssit eivät ole kunnossa. Pelaajaa ei voi lisätä kilpailuun.\n\nTarkastakaa, että henkilön nimi, syntymävuosi ja PDGA-numero ovat oikein Kisakoneen tiedoissa ja täsmäävät Jäsenrekisterin tietoihin.
 licenses_fail_onlyb    Kilpailuun vaaditaan A-lisenssi ja pelaajalla on vain B-lisenssi.
-license_fail_foreign   Ulkomaisen pelaajan PDGA-jäsenyys ei ole voimassa, eikä pelaaja voi osallistua kilpailuun.
+license_fail_foreign   Ulkomaisen pelaajan PDGA-jäsenyys ei ole voimassa.\n Pelaajaa ei voi ilmoittaa kilpailuun tällä hetkellä.
 
 pdga_rating            Rating
 pdga_status            Luokitus

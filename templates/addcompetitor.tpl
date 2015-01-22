@@ -205,7 +205,7 @@ $(document).ready(function(){
                 {/if}
                 </div>
             {else}
-                {if $pdga && $pdga_country != "finland"}
+                {if $pdga && $pdga_country != "fi"}
                     {if $pdga_membership_status != "current"}
                         <div class="error">{translate id='license_fail_foreign'}</div>
                         {assign var="licenses_ok" value=false}

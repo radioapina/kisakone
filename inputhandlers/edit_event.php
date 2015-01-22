@@ -150,12 +150,14 @@ function processForm()
     }
 
     $pdgaId = @$_POST['pdgaeventid'];
-    if (!is_numeric($pdgaId)) {
-        $problems['pdgaeventid'] = translate('FormError_NotPositiveInteger');
-    }
-    $pdgaId = (int) $pdgaId;
-    if (!(is_int($pdgaId) && $pdgaId >= 0)) {
-        $problems['pdgaeventid'] = translate('FormError_NotPositiveInteger');
+    if (!empty($pdgaId)) {
+        if (!is_numeric($pdgaId)) {
+            $problems['pdgaeventid'] = translate('FormError_NotPositiveInteger');
+        }
+        $pdgaId = (int) $pdgaId;
+        if (!(is_int($pdgaId) && $pdgaId >= 0)) {
+            $problems['pdgaeventid'] = translate('FormError_NotPositiveInteger');
+        }
     }
 
     $officials = array();

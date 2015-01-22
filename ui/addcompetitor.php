@@ -97,7 +97,7 @@ function InitializeSmartyVariables(&$smarty, $error)
             $smarty->assign('pdga', false);
 
             // if PDGA API is enabled and player has PDGA number assigned, do the checks
-            if ($settings['PDGA_ENABLED'] && $player->pdga && $player->pdga > 0) {
+            if (@$settings['PDGA_ENABLED'] && $player->pdga && $player->pdga > 0) {
                 error_log("Checking PDGA data for #".$player->pdga);
                 $smarty->assign('pdga', true);
                 $pdga_data = pdga_getPlayer($player->pdga);
@@ -105,7 +105,8 @@ function InitializeSmartyVariables(&$smarty, $error)
                 // Display an error if connection fails
                 if ($pdga_data == null) {
                     $smarty->assign('pdga_error', 1);
-                } else {
+                }
+                else {
                     $smarty->assign('pdga_rating', $pdga_data['rating']);
                     $smarty->assign('pdga_classification', $pdga_data['classification'] == "P" ? "Pro" : "Am");
                     $smarty->assign('pdga_birth_year', $pdga_data['birth_year']);
@@ -131,7 +132,8 @@ function InitializeSmartyVariables(&$smarty, $error)
         }
         $smarty->assign('classOptions', $classOptions);
 
-    } elseif (@$_GET['op_s'] || $player) {
+    }
+    elseif (@$_GET['op_s'] || $player) {
         // "Search" button has been pressed
 
         // Due to autocomplete we have some extra characters which cause the search to fail, remove them
@@ -154,7 +156,8 @@ function InitializeSmartyVariables(&$smarty, $error)
 
     if (is_object($error)) {
         $smarty->assign('error', $error->data);
-    } elseif (is_string($error)) {
+    }
+    elseif (is_string($error)) {
         $smarty->assign('errorString', $error);
     }
 }

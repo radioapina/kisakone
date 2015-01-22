@@ -114,7 +114,7 @@ function InitializeSmartyVariables(&$smarty, $error)
                     $smarty->assign('pdga_membership_status', $pdga_data['membership_status']);
                     $smarty->assign('pdga_membership_expiration_date', $pdga_data['membership_expiration_date']);
                     $smarty->assign('pdga_official_status', $pdga_data['official_status']);
-                    $smarty->assign('pdga_country', strtolower($pdga_data['country']));
+                    $smarty->assign('pdga_country', strtoupper($pdga_data['country']));
 
                     // Remove classes from drop-down based on PDGA data
                     foreach ($classOptions as $cid => $cname) {

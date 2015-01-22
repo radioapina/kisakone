@@ -182,7 +182,9 @@ $(document).ready(function(){
                 <label for="rating">{translate id='pdga_rating'}</label>
                     <span name="rating">{$pdga_rating}</span><br />
                 <label for="status">{translate id='pdga_status'}</label>
-                    <span name="status">{$pdga_classification}</span>
+                    <span name="status">{$pdga_classification}</span><br />
+                <label for="status">{translate id='pdga_country'}</label>
+                    <span name="status">{$pdga_country}</span><br />
             </div>
             {/if}
 
@@ -205,7 +207,7 @@ $(document).ready(function(){
                 {/if}
                 </div>
             {else}
-                {if $pdga && $pdga_country != "fi"}
+                {if $pdga && $pdga_country != "FI"}
                     {if $pdga_membership_status != "current"}
                         <div class="error">{translate id='license_fail_foreign'}</div>
                         {assign var="licenses_ok" value=false}

@@ -77,6 +77,7 @@ pdga_membership_expired Päättynyt
 pdga_official          Sääntötesti
 pdga_official_yes      Suoritettu
 pdga_official_no       Ei
+pdga_country           Maa
 
 user_ban    Estä käyttö
 ban         Estä
